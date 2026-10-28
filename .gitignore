@@ -17,6 +17,7 @@
 !/device/config/chips/t113/configs
 /device/config/chips/t113/configs/*
 !/device/config/chips/t113/configs/evb1_auto_nand
+!/device/config/chips/t113/configs/t113s3-core
 
 # 自己的补丁 / 脚本 / 笔记
 !/patches

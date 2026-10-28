@@ -1,0 +1,53 @@
+;---------------------------------------------------------------------------------------------------
+; t113s3-core  (T113-S3 + 16GB eMMC)
+; size 单位 = 扇区(512B)；全部按 1MB(2048 扇区) 对齐，适配 eMMC
+;---------------------------------------------------------------------------------------------------
+[mbr]
+size = 252
+
+[partition_start]
+
+[partition]
+    name         = boot-resource
+    size         = 32768
+    downloadfile = "boot-resource.fex"
+    user_type    = 0x8000
+
+[partition]
+    name         = env
+    size         = 2048
+    downloadfile = "env.fex"
+    user_type    = 0x8000
+
+[partition]
+    name         = env-redund
+    size         = 2048
+    downloadfile = "env.fex"
+    user_type    = 0x8000
+
+[partition]
+    name         = boot
+    size         = 65536
+    downloadfile = "boot.fex"
+    user_type    = 0x8000
+
+[partition]
+    name         = rootfs
+    size         = 3145728
+    downloadfile = "rootfs.fex"
+    user_type    = 0x8000
+
+[partition]
+    name         = dsp0
+    size         = 2048
+    downloadfile = "amp_dsp0.fex"
+    user_type    = 0x8000
+
+[partition]
+    name         = private
+    size         = 4096
+    user_type    = 0x8000
+
+[partition]
+    name         = UDISK
+    user_type    = 0x8100
