@@ -7,7 +7,7 @@
 #include "sun8iw20p1.dtsi"
 
 /{
-	board = "t113", "t113-evb1_auto";
+	board = "t113", "t113-t113s3-core";
 	model = "sun8iw20";
 	compatible = "allwinner,t113", "arm,sun8iw20p1";
 
@@ -129,7 +129,7 @@
 		compatible = "mailbox-test";
 		mboxes = <&msgbox 5>;
 		mbox-names = "tx|rx";
-		status = "okay";
+		status = "disabled";
 	};
 
 	mailbox_heartbeat: mailbox_heartbeat@0 {
@@ -137,7 +137,7 @@
 		rproc-np = <&dsp0_rproc>;
 		mboxes = <&msgbox 6>, <&msgbox 7>;
 		mbox-names = "tx", "rx";
-		status = "okay";
+		status = "disabled";
 	};
 
 	dsp0_rproc: dsp_rproc@0 {
@@ -179,7 +179,7 @@
 
 		id = <0>;
 		firmware-name = "amp_dsp0.bin";
-		status = "okay";
+		status = "disabled";
 	};
 
 	rpbuf_controller0: rpbuf_controller@0 {
@@ -188,7 +188,7 @@
 		ctrl_id = <0>;  /* index of /dev/rpbuf_ctrl */
 		/*iommus = <&mmu_aw 5 1>;*/
 		/* memory-region = <&dsp0_rpbuf_reserved>; */
-		status = "okay";
+		status = "disabled";
 	};
 
 	rpbuf_controller1: rpbuf_controller@1 {
@@ -203,7 +203,7 @@
 	rpbuf_sample0: rpbuf_sample@0 {
 		compatible = "allwinner,rpbuf-sample";
 		rpbuf = <&rpbuf_controller0>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	rpbuf_sample1: rpbuf_sample@1 {
@@ -234,27 +234,7 @@
 		status = "disabled";
 	};
 
-	reg_vdd_cpu: vdd-cpu {
-		compatible = "sunxi-pwm-regulator";
-		pwms = <&pwm 3 5000 1>;
-		regulator-name = "vdd_cpu";
-		regulator-min-microvolt = <800000>;
-		regulator-max-microvolt = <1150000>;
-		regulator-settling-time-us = <4000>;
-		regulator-always-on;
-		regulator-boot-on;
-		status = "okay";
-	};
 
-	reg_usb1_vbus: usb1-vbus {
-		compatible = "regulator-fixed";
-		regulator-name = "usb1-vbus";
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		regulator-enable-ramp-delay = <1000>;
-		gpio = <&pio PB 3 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-	};
 
 	awlink0: awlink@0x0 {
 		#address-cells = <1>;
@@ -266,9 +246,6 @@
 	};
 };
 
-&cpu0 {
-	cpu-supply = <&reg_vdd_cpu>;
-};
 
 &pio {
 	input-debounce = <0 0 0 0 0 1>;
@@ -756,13 +733,33 @@
 		function = "io_disabled";
 		drive-strength = <10>;
 	};
+
+	sdc0_pins_e: sdc0@4 {
+		pins = "PF0", "PF1", "PF3",
+			"PF5";
+		function = "jtag";
+		drive-strength = <10>;
+		bias-pull-up;
+	};
+
+	uart0_pins_c: uart0_pins@2 {  /* t113s3-core: uart0 remap to PE2/PE3 */
+		pins = "PE2", "PE3";
+		function = "uart0";
+		drive-strength = <10>;
+		bias-pull-up;
+	};
+
+	uart0_pins_d: uart0_pins@3 {
+		pins = "PE2", "PE3";
+		function = "gpio_in";
+	};
 };
 
 &uart0 {
 	pinctrl-names = "default", "sleep";
-	pinctrl-0 = <&uart0_pins_a>;
-	pinctrl-1 = <&uart0_pins_b>;
-	status = "disabled";
+	pinctrl-0 = <&uart0_pins_c>;
+	pinctrl-1 = <&uart0_pins_d>;
+	status = "okay";
 };
 
 &uart1 {
@@ -789,27 +786,23 @@
 &sdc2 {
 	non-removable;
 	bus-width = <4>;
-	mmc-ddr-1_8v;
-	mmc-hs200-1_8v;
 	no-sdio;
 	no-sd;
 	ctl-spec-caps = <0x308>;
 	cap-mmc-highspeed;
 	sunxi-power-save-mode;
-	sunxi-dis-signal-vol-sw;
 	mmc-bootpart-noacc;
-	max-frequency = <150000000>;
+	max-frequency = <100000000>;
 	/*vmmc-supply = <&reg_dcdc1>;*/
 	/*emmc io vol 3.3v*/
 	/*vqmmc-supply = <&reg_aldo1>;*/
 	/*emmc io vol 1.8v*/
 	/*vqmmc-supply = <&reg_eldo1>;*/
-	status = "disabled";
+	status = "okay";
 };
 
 &sdc0 {
 	bus-width = <4>;
-	cd-gpios = <&pio PF 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 	/*non-removable;*/
 	broken-cd;
 	/*cd-inverted*/
@@ -882,13 +875,13 @@
 	twi_drv_used = <1>;
 	dmas = <&dma 45>, <&dma 45>;
 	dma-names = "tx", "rx";
-	status = "okay";
+	status = "disabled";
 
         ctp@14 {
                 compatible = "allwinner,goodix";
                 device_type = "ctp";
                 reg = <0x14>;
-                status = "okay";
+                status = "disabled";
                 ctp_name = "gt9xxnew_ts";
                 ctp_twi_id = <0x2>;
                 ctp_twi_addr = <0x14>;
@@ -940,7 +933,7 @@
 	spi_slave_mode = <0>;
 	spi0_cs_number = <1>;
 	spi0_cs_bitmap = <1>;
-	status = "okay";
+	status = "disabled";
 
 	spi-nand@0 {
 		compatible = "spi-nand";
@@ -948,7 +941,7 @@
 		reg = <0x0>;
 		spi-rx-bus-width=<0x04>;
 		spi-tx-bus-width=<0x04>;
-		status="okay";
+		status="disabled";
 	};
 
 	spi_board@0 {
@@ -1003,7 +996,7 @@
 &s_cir0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&s_cir0_pins_a>;
-	status = "okay";
+	status = "disabled";
 };
 
 &ir1 {
@@ -1021,7 +1014,7 @@
 	tx-delay = <3>;
 	rx-delay = <0>;
 	phy-rst = <&pio PE 10 GPIO_ACTIVE_HIGH>;
-	status = "okay";
+	status = "disabled";
 };
 
 &ve {
@@ -1071,10 +1064,10 @@
 		pinctrl-0 = <&sdc2_pins_a>;
 		/*pinctrl-0 = <&sdc0_pins_a>;*/
 		/*sdc_ex_dly_used = <0x2>;*/
-		sdc_io_1v8 = <0x1>;
+		sdc_io_1v8 = <0x0>;
 		/*sdc_type = "tm4";*/
-		sdc_tm4_hs200_max_freq = <150>;
-		sdc_tm4_hs400_max_freq = <100>;
+		/*sdc_tm4_hs200_max_freq = <150>;*/
+		/*sdc_tm4_hs400_max_freq = <100>;*/
 		sdc_ex_dly_used = <2>;
 		/*sdc_tm4_win_th = <8>;*/
 		/*sdc_dis_host_caps = <0x180>;*/
@@ -1262,7 +1255,7 @@ chn_cfg_mode     : Hardware DE channel allocation config. 0:single display with 
 	disp_init_enable         = <1>;
 	disp_mode                = <0>;
 
-	screen0_output_type      = <1>;
+	screen0_output_type      = <0>;
 	screen0_output_mode      = <4>;
 
 	screen1_output_type      = <1>;
@@ -1276,7 +1269,7 @@ chn_cfg_mode     : Hardware DE channel allocation config. 0:single display with 
 	screen1_output_scan      = <0>;
 	screen1_output_aspect_ratio = <8>;
 
-	dev0_output_type         = <1>;
+	dev0_output_type         = <0>;
 	dev0_output_mode         = <4>;
 	dev0_screen_id           = <0>;
 	dev0_do_hpd              = <0>;
@@ -1383,7 +1376,7 @@ pull up or pull down(default 0), driver level(default 1), data>
 &lcd0 {
 
         /* part 1 */
-        lcd_used            = <1>;
+        lcd_used            = <0>;
         lcd_driver_name     = "default_lcd";
         lcd_backlight       = <100>;
         /* part 2 */
@@ -1690,11 +1683,11 @@ tvd_row*tvd_column is the total tvd channel number to be used in multichannel mo
 &usbc0 {
 	device_type = "usbc0";
 	usb_port_type = <0x2>;
-	usb_detect_type = <0x1>;
+	usb_detect_type = <0x0>;
 	usb_detect_mode = <0>;
-	usb_id_gpio = <&pio PE 12 GPIO_ACTIVE_HIGH>;
+	/*usb_id_gpio = <&pio PE 12 GPIO_ACTIVE_HIGH>;*/
 	enable-active-high;
-	usb_det_vbus_gpio = <&pio PE 12 GPIO_ACTIVE_HIGH>;
+	/*usb_det_vbus_gpio = <&pio PE 12 GPIO_ACTIVE_HIGH>;*/
 	usb_wakeup_suspend = <0>;
 	usb_serial_unique = <0>;
 	usb_serial_number = "20080411";
@@ -1703,11 +1696,9 @@ tvd_row*tvd_column is the total tvd channel number to be used in multichannel mo
 };
 
 &ehci0 {
-	drvvbus-supply = <&reg_usb1_vbus>;
 };
 
 &ohci0 {
-	drvvbus-supply = <&reg_usb1_vbus>;
 };
 
 &usbc1 {
@@ -1719,12 +1710,10 @@ tvd_row*tvd_column is the total tvd channel number to be used in multichannel mo
 	status = "okay";
 };
 &ehci1 {
-	drvvbus-supply = <&reg_usb1_vbus>;
 	status = "okay";
 };
 
 &ohci1 {
-	drvvbus-supply = <&reg_usb1_vbus>;
 	status = "okay";
 };
 
@@ -1732,14 +1721,14 @@ tvd_row*tvd_column is the total tvd channel number to be used in multichannel mo
 	pinctrl-names = "active", "sleep";
 	pinctrl-0 = <&pwm3_pin_a>;
 	pinctrl-1 = <&pwm3_pin_b>;
-	status = "okay";
+	status = "disabled";
 };
 
 &pwm7 {
 	pinctrl-names = "active", "sleep";
 	pinctrl-0 = <&pwm7_pin_a>;
 	pinctrl-1 = <&pwm7_pin_b>;
-	status = "okay";
+	status = "disabled";
 };
 
 &gpadc {
