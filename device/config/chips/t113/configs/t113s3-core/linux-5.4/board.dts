@@ -665,13 +665,13 @@
 	};
 
 	ledc_pins_a: ledc@0 {
-		pins = "PF2";
+		pins = "PG13";
 		function = "ledc";
 		drive-strength = <10>;
 	};
 
 	ledc_pins_b: ledc@1 {
-		pins = "PF2";
+		pins = "PG13";
 		function = "gpio_in";
 	};
 	rgb24_pins_a: rgb24@0 {
@@ -798,7 +798,7 @@
 	/*vqmmc-supply = <&reg_aldo1>;*/
 	/*emmc io vol 1.8v*/
 	/*vqmmc-supply = <&reg_eldo1>;*/
-	status = "okay";
+	status = "disabled";
 };
 
 &sdc0 {
@@ -978,19 +978,20 @@
 };
 
 &ledc {
+	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&ledc_pins_a>;
 	pinctrl-1 = <&ledc_pins_b>;
-	led_count = <32>;
-	output_mode = "GRB";
-	reset_ns = <84>;
-	t1h_ns = <800>;
-	t1l_ns = <450>;
-	t0h_ns = <400>;
-	t0l_ns = <850>;
+	led_count = <1>;			/* 板上只有 LED7 一颗 WS2812B */
+	output_mode = "GRB";		/* WS2812B 数据顺序 GRB */
+	reset_ns = <300000>;		/* RES > 280us */
+	t0h_ns = <350>;			/* 0 码高 220~380 */
+	t0l_ns = <900>;			/* 0 码低 580~1000 */
+	t1h_ns = <850>;			/* 1 码高 580~1000 */
+	t1l_ns = <400>;			/* 1 码低 220~420 */
 	wait_time0_ns = <84>;
 	wait_time1_ns = <84>;
-	wait_data_time_ns = <600000>;
-	status	= "disabled";
+	wait_data_time_ns = <300000>;
+	status = "okay";
 };
 
 &s_cir0 {
