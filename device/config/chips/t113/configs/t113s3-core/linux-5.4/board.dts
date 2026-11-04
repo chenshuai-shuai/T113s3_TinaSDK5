@@ -330,11 +330,13 @@
 		       "PC5", "PC6", "PC7";
 		function = "gpio_in";
 	};
-
+	
+	/*
 	wlan_pins_a:wlan@0 {
 		pins = "PG11";
 		function = "clk_fanout1";
 	};
+	*/
 
 	lvds0_pins_a: lvds0@0 {
 		allwinner,pins  = "PD0", "PD1", "PD2", "PD3", "PD4", "PD5", "PD6", "PD7", "PD8", "PD9";
@@ -845,6 +847,14 @@
 	max-frequency = <150000000>;
 	ctl-spec-caps = <0x8>;
 	status = "okay";
+
+	brcmf: wifi@1 {
+		reg = <1>;
+		compatible = "brcm,bcm4329-fmac";
+		interrupt-parent = <&pio>;
+		interrupts = <PG 9 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "host-wake";
+	};
 };
 
 
@@ -1076,10 +1086,7 @@
 
 	rfkill: rfkill@0 {
 		compatible    = "allwinner,sunxi-rfkill";
-		chip_en;
-		power_en;
-		pinctrl-0 = <&wlan_pins_a>;
-		pinctrl-names = "default";
+		chip_en = <&pio PG 12 GPIO_ACTIVE_HIGH>;
 		status        = "okay";
 
 		wlan: wlan@0 {
@@ -1087,19 +1094,18 @@
 			clock-names = "32k-fanout1";
 			clocks = <&ccu CLK_FANOUT1_OUT>;
 			wlan_busnum    = <0x1>;
-			wlan_regon    = <&pio PG 12 GPIO_ACTIVE_HIGH>;
-			wlan_hostwake  = <&pio PG 10 GPIO_ACTIVE_HIGH>;
+			wlan_regon    = <&pio PG 7 GPIO_ACTIVE_HIGH>;
+			wlan_hostwake  = <&pio PG 9 GPIO_ACTIVE_HIGH>;
 			/*wlan_power    = "VCC-3V3";*/
 			/*wlan_power_vol = <3300000>;*/
 			/*interrupt-parent = <&pio>;
-			interrupts = < PG 10 IRQ_TYPE_LEVEL_HIGH>;*/
+			interrupts = < PG 9 IRQ_TYPE_LEVEL_HIGH>;*/
 			wakeup-source;
 		};
 
 		bt: bt@0 {
 			compatible    = "allwinner,sunxi-bt";
-			pinctrl-0 = <&wlan_pins_a>;
-			pinctrl-names = "default";
+
 			clock-names = "32k-fanout1";
 			clocks = <&ccu CLK_FANOUT1_OUT>;
 			/*bt_power_num = <0x01>;*/
@@ -1107,16 +1113,16 @@
 			/*bt_io_regulator = "axp803-dldo1";*/
 			/*bt_io_vol = <3300000>;*/
 			/*bt_power_vol = <330000>;*/
-			bt_rst_n      = <&pio PG 15 GPIO_ACTIVE_LOW>;
+			bt_rst_n      = <&pio PG 8 GPIO_ACTIVE_LOW>;
 			status        = "okay";
 		};
 	};
 
 	btlpm: btlpm@0 {
 		compatible  = "allwinner,sunxi-btlpm";
-		uart_index  = <0x1>;
-		bt_wake     = <&pio PB 5 GPIO_ACTIVE_HIGH>;
-		bt_hostwake = <&pio PB 4 GPIO_ACTIVE_HIGH>;
+		uart_index  = <0x3>;
+		bt_wake     = <&pio PG 11 GPIO_ACTIVE_HIGH>;
+		bt_hostwake = <&pio PG 10 GPIO_ACTIVE_HIGH>;
 		status      = "disabled";
 	};
 
