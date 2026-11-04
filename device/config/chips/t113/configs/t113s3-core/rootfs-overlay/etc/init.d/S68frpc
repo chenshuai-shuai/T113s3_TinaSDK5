@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# frpc - 内网穿透客户端
+#
+# 热重载(不断线)：  /etc/init.d/S68frpc reload
+# 完全重启(会断线)： /etc/init.d/S68frpc restart
+# 只看状态：        /etc/init.d/S68frpc status
+#
+DAEMON=/usr/bin/frpc
+CONF=/etc/frp/frpc.toml
+PIDFILE=/var/run/frpc.pid
+case "$1" in
+start)
+printf "Starting frpc: "
+if [ -f "$PIDFILE" ] && kill -0 $(cat "$PIDFILE") 2>/dev/null; then
+echo "already running (pid $(cat "$PIDFILE"))"
+exit 0
+fi
+start-stop-daemon -S -b -m -p "$PIDFILE" -x "$DAEMON" -- -c "$CONF"
+sleep 1
+if [ -f "$PIDFILE" ] && kill -0 $(cat "$PIDFILE") 2>/dev/null; then
+echo "OK (pid $(cat "$PIDFILE"))"
+else
+echo "FAILED"
+exit 1
+fi
+;;
+stop)
+printf "Stopping frpc: "
+if [ -f "$PIDFILE" ]; then
+start-stop-daemon -K -p "$PIDFILE" 2>/dev/null
+rm -f "$PIDFILE"
+fi
+echo "OK"
+;;
+reload)
+printf "Reloading frpc config (hot, no disconnect): "
+$DAEMON reload -c "$CONF" 2>&1
+;;
+restart)
+"$0" stop
+sleep 1
+"$0" start
+;;
+status)
+if [ -f "$PIDFILE" ] && kill -0 $(cat "$PIDFILE") 2>/dev/null; then
+echo "frpc is running (pid $(cat "$PIDFILE"))"
+else
+echo "frpc is not running"
+fi
+;;
+*)
+echo "Usage: $0 {start|stop|restart|reload|status}"
+exit 1
+;;
+esac
+exit 0

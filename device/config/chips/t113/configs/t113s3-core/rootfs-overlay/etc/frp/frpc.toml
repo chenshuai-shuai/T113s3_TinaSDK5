@@ -1,0 +1,35 @@
+# ============================================================
+# frpc 配置 —— T113S3-CORE 板子  (stcp 安全模式)
+#
+# 热重载(不断线):  /usr/bin/frpc reload -c /etc/frp/frpc.toml
+# 校验语法:        /usr/bin/frpc verify -c /etc/frp/frpc.toml
+#
+# stcp 模式说明：
+#   公网上不暴露任何端口。访问端需要在 frpc.toml 里加对应的
+#   [[visitors]] 段(同一 secretKey)，然后连 127.0.0.1:<bindPort>
+# ============================================================
+
+serverAddr = "8.148.77.2"
+serverPort = 7000
+
+auth.method = "token"
+auth.token = "28901fa7816114ce65c2fbd656a3720e"
+
+# ---------- 管理接口（热重载必需） ----------
+webServer.addr = "127.0.0.1"
+webServer.port = 7400
+webServer.user = "admin"
+webServer.password = "t113admin"
+
+# ---------- 日志 ----------
+log.to = "/var/log/frpc.log"
+log.level = "info"
+log.maxDays = 3
+
+# ---------- 代理：SSH（stcp 模式，不暴露公网端口） ----------
+[[proxies]]
+name = "t113-ssh"
+type = "stcp"
+secretKey = "7c51ca8491420c3e86f15cc27a7c56a3"
+localIP = "127.0.0.1"
+localPort = 22
